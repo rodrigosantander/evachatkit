@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <title>EVA Script · Asistente SFMC</title>
 
-    <!-- Carga del script de ChatKit -->
+    <!-- Script oficial de ChatKit -->
     <script
       src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
       defer
@@ -67,51 +67,69 @@
     </div>
 
     <script>
-      async function initEvaChat() {
-        try {
-          // 1️⃣ Obtener el client_secret de tu función Netlify
-          const response = await fetch("/.netlify/functions/chatkit-session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: "eva-test-user" }),
-          });
-
-          if (!response.ok) {
-            console.error("Error al obtener client_secret:", response.status);
-            console.error(await response.text());
-            return;
-          }
-
-          const data = await response.json();
-          const clientToken = data.client_secret;
-
-          console.log("🔑 Client token recibido:", clientToken);
-
-          if (!clientToken) {
-            console.error("⚠️ No se recibió client_secret:", data);
-            return;
-          }
-
-          // 2️⃣ Crear el componente de ChatKit
-          const chatkit = document.createElement("openai-chatkit");
-
-          // Configuración mínima recomendada
-          chatkit.setOptions({
-            api: { clientToken },
-          });
-
-          chatkit.classList.add("eva-chat");
-
-          // 3️⃣ Agregar el componente al contenedor
-          document
-            .getElementById("eva-chat-container")
-            .appendChild(chatkit);
-        } catch (err) {
-          console.error("Error inicializando EVA:", err);
+      function initEvaChat() {
+        const container = document.getElementById("eva-chat-container");
+        if (!container) {
+          console.error("No se encontró el contenedor EVA");
+          return;
         }
+
+        const chatkit = document.createElement("openai-chatkit");
+        chatkit.classList.add("eva-chat");
+
+        // 💡 Esta es la forma que la doc oficial recomienda para Web Component:
+        // api: { async getClientSecret(currentClientSecret) { ... } }
+        chatkit.setOptions({
+          api: {
+            async getClientSecret(currentClientSecret) {
+              console.log(
+                "🔄 getClientSecret llamado. ¿Había uno previo?:",
+                !!currentClientSecret
+              );
+
+              const res = await fetch(
+                "/.netlify/functions/chatkit-session",
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    userId: "eva-test-user",
+                    currentClientSecret,
+                  }),
+                }
+              );
+
+              if (!res.ok) {
+                console.error(
+                  "Error desde la función Netlify:",
+                  res.status,
+                  res.statusText
+                );
+                const text = await res.text();
+                console.error("Respuesta:", text);
+                throw new Error("No se pudo obtener client_secret");
+              }
+
+              const data = await res.json();
+              console.log("✅ client_secret recibido:", data.client_secret);
+
+              if (!data.client_secret) {
+                console.error(
+                  "La respuesta no trae client_secret:",
+                  data
+                );
+                throw new Error("Respuesta inválida del servidor");
+              }
+
+              // Lo que espera ChatKit: un string client_secret
+              return data.client_secret;
+            },
+          },
+        });
+
+        container.appendChild(chatkit);
       }
 
-      // Esperar a que todo cargue
       window.addEventListener("load", initEvaChat);
     </script>
   </body>
