@@ -2,12 +2,12 @@
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <title>EVA ChatKit</title>
+    <title>EVA Script · Asistente SFMC</title>
 
-    <!-- 3. ChatKit JS script from OpenAI -->
+    <!-- Carga del script de ChatKit -->
     <script
       src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
-      async
+      defer
     ></script>
 
     <style>
@@ -16,7 +16,7 @@
         padding: 0;
         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
           sans-serif;
-        background: #050816;
+        background: radial-gradient(circle at top, #0b1120, #000);
         color: #ffffff;
         display: flex;
         align-items: center;
@@ -33,7 +33,7 @@
 
       .eva-card {
         border-radius: 16px;
-        background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
+        background: linear-gradient(180deg, #111827 0%, #020617 100%);
         box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
         padding: 12px;
       }
@@ -62,59 +62,57 @@
         <div class="eva-header">
           <strong>EVA Script</strong> · Asistente SFMC
         </div>
-        <!-- Aquí meteremos el componente de ChatKit -->
         <div id="eva-chat-container"></div>
       </div>
     </div>
 
     <script>
       async function initEvaChat() {
-        // 1. Pedimos el client_secret a tu función de Netlify
-        const response = await fetch("/.netlify/functions/chatkit-session", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          // Aquí más adelante puedes mandar ContactKey, email, etc.
-          body: JSON.stringify({ userId: "eva-test-user" }),
-        });
+        try {
+          // 1️⃣ Obtener el client_secret de tu función Netlify
+          const response = await fetch("/.netlify/functions/chatkit-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId: "eva-test-user" }),
+          });
 
-        if (!response.ok) {
-          console.error("Error getting client_secret", await response.text());
-          return;
+          if (!response.ok) {
+            console.error("Error al obtener client_secret:", response.status);
+            console.error(await response.text());
+            return;
+          }
+
+          const data = await response.json();
+          const clientToken = data.client_secret;
+
+          console.log("🔑 Client token recibido:", clientToken);
+
+          if (!clientToken) {
+            console.error("⚠️ No se recibió client_secret:", data);
+            return;
+          }
+
+          // 2️⃣ Crear el componente de ChatKit
+          const chatkit = document.createElement("openai-chatkit");
+
+          // Configuración mínima recomendada
+          chatkit.setOptions({
+            api: { clientToken },
+          });
+
+          chatkit.classList.add("eva-chat");
+
+          // 3️⃣ Agregar el componente al contenedor
+          document
+            .getElementById("eva-chat-container")
+            .appendChild(chatkit);
+        } catch (err) {
+          console.error("Error inicializando EVA:", err);
         }
-
-        const data = await response.json();
-        const clientToken = data.client_secret;
-
-        // 2. Creamos el web component <openai-chatkit>
-        const chatkit = document.createElement("openai-chatkit");
-
-        // API config: le damos el clientToken
-        chatkit.setOptions({
-          api: { clientToken },
-          // Opcional: un poquito de tema
-          theme: {
-            colorScheme: "dark",
-            accentColor: "#22c55e",
-            assistant: {
-              name: "EVA Script",
-            },
-          },
-        });
-
-        chatkit.classList.add("eva-chat");
-
-        // 3. Lo agregamos al contenedor
-        document
-          .getElementById("eva-chat-container")
-          .appendChild(chatkit);
       }
 
-      // Espera a que cargue el script de ChatKit
-      window.addEventListener("load", () => {
-        initEvaChat().catch((err) => console.error(err));
-      });
+      // Esperar a que todo cargue
+      window.addEventListener("load", initEvaChat);
     </script>
   </body>
 </html>
