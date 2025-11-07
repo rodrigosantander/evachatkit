@@ -6,7 +6,7 @@ const client = new OpenAI({
 });
 
 export async function handler(event, context) {
-  // Basic CORS handling for calls from CloudPages / other origins
+  // CORS para llamadas desde navegador / CloudPage
   if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 204,
@@ -28,14 +28,26 @@ export async function handler(event, context) {
   }
 
   try {
-    const body = event.body ? JSON.parse(event.body) : {};
-    const userId = body.userId || null; // optional, you can pass ContactKey later
+    // Logs de debug (solo se ven en Netlify, no en el response)
+    console.log("Has OPENAI_API_KEY?", !!process.env.OPENAI_API_KEY);
+    console.log("CHATKIT_WORKFLOW_ID:", process.env.CHATKIT_WORKFLOW_ID);
 
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not set");
+    }
+    if (!process.env.CHATKIT_WORKFLOW_ID) {
+      throw new Error("CHATKIT_WORKFLOW_ID is not set");
+    }
+
+    const body = event.body ? JSON.parse(event.body) : {};
+    const userId = body.userId || "anonymous";
+
+    // 👇 Esta es la parte clave: workflow: { id: ... }
     const session = await client.beta.chatkit.sessions.create({
-      workflow_id: process.env.CHATKIT_WORKFLOW_ID,
-      // optional context
-      user: userId || undefined,
-      // metadata: { source: "SFMC_CloudPage" } // example
+      user: userId,
+      workflow: {
+        id: process.env.CHATKIT_WORKFLOW_ID,
+      },
     });
 
     return {
@@ -57,7 +69,10 @@ export async function handler(event, context) {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
-      body: JSON.stringify({ error: "Error creating ChatKit session" }),
+      body: JSON.stringify({
+        error: "Error creating ChatKit session",
+        detail: err.message ?? "Unknown error",
+      }),
     };
   }
 }
