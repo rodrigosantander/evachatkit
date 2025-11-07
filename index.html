@@ -125,16 +125,18 @@
             },
           },
 
-          // 📎 Configuración del composer: habilitar adjuntos
+          // 📎 Habilitar adjuntos con estrategia 'hosted' (recomendado)
           composer: {
             attachments: {
               enabled: true,
-              // Si quieres limitar, puedes descomentar y ajustar:
+              uploadStrategy: { type: "hosted" }, // <- clave para que se suban bien
+              // Opcional: límites
+              // maxSize: 20 * 1024 * 1024, // 20 MB por archivo
               // maxCount: 5,
-              // maxSize: 20 * 1024 * 1024, // 20 MB
-              // accept: {
+              // accept: {                   // si quisieras limitar tipos
               //   "application/pdf": [".pdf"],
-              //   "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+              //   "text/csv": [".csv"],
+              //   "text/html": [".html", ".htm"],
               // }
             },
           },
