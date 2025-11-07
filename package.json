@@ -1,0 +1,17 @@
+{
+  "name": "eva-chatkit-backend",
+  "version": "1.0.0",
+  "description": "Backend for ChatKit session creation on Netlify",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo \"Nothing to build\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "openai": "^6.8.1"
+  }
+}
