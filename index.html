@@ -129,13 +129,16 @@
           composer: {
             attachments: {
               enabled: true,
-              // Si quieres limitar, puedes descomentar y ajustar:
-              // maxCount: 5,
-              // maxSize: 20 * 1024 * 1024, // 20 MB
-              // accept: {
-              //   "application/pdf": [".pdf"],
-              //   "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
-              // }
+              maxCount: 5,
+              maxSize: 20 * 1024 * 1024, // 20 MB
+              accept: {
+                "text/html": [".html", ".htm"],
+                "text/csv": [".csv"],
+                "application/pdf": [".pdf"],
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
+                "text/plain": [".txt"],
+              },
             },
           },
         });
