@@ -77,9 +77,8 @@
         const chatkit = document.createElement("openai-chatkit");
         chatkit.classList.add("eva-chat");
 
-        // 💡 Esta es la forma que la doc oficial recomienda para Web Component:
-        // api: { async getClientSecret(currentClientSecret) { ... } }
         chatkit.setOptions({
+          // 🔐 Cómo obtiene ChatKit el client_secret desde tu backend
           api: {
             async getClientSecret(currentClientSecret) {
               console.log(
@@ -123,6 +122,20 @@
 
               // Lo que espera ChatKit: un string client_secret
               return data.client_secret;
+            },
+          },
+
+          // 📎 Configuración del composer: habilitar adjuntos
+          composer: {
+            attachments: {
+              enabled: true,
+              // Si quieres limitar, puedes descomentar y ajustar:
+              // maxCount: 5,
+              // maxSize: 20 * 1024 * 1024, // 20 MB
+              // accept: {
+              //   "application/pdf": [".pdf"],
+              //   "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
+              // }
             },
           },
         });
