@@ -51,14 +51,6 @@ export async function handler(event) {
           enabled: true,
           max_file_size: 20, // MB por archivo
           max_files: 5,      // máximo archivos por mensaje
-          allowed_mime_types: [
-            "text/html",
-            "text/csv",
-            "application/pdf",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", // .xlsx
-            "text/plain",
-          ],
         },
       },
     });
