@@ -134,25 +134,31 @@ border-radius: 1em;
                 throw new Error("Respuesta inválida del servidor");
               }
 
-              // Lo que espera ChatKit: un string client_secret
               return data.client_secret;
             },
           },
 
-          // 📎 Configuración del composer: habilitar adjuntos
+          // 📎 Adjuntos habilitados
           composer: {
             attachments: {
               enabled: true,
-              maxCount: 5,
-              maxSize: 20 * 1024 * 1024, // 20 MB
-              accept: {
-                "text/html": [".html", ".htm"],
-                "text/csv": [".csv"],
-                "application/pdf": [".pdf"],
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"],
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"],
-                "text/plain": [".txt"],
+            },
+          },
+
+          // 🌙 Tema dark + acento verde EVA
+          theme: {
+            colorScheme: "dark", // <- esto pone el UI en dark mode
+            color: {
+              accent: {
+                primary: "#22c55e", // verde EVA
+                level: 2,
               },
+            },
+            radius: "round",
+            density: "normal",
+            typography: {
+              fontFamily:
+                "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
             },
           },
         });
