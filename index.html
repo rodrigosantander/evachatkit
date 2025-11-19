@@ -1,172 +1,184 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <title>EVA Script · Asistente SFMC</title>
 
-    <!-- Script oficial de ChatKit -->
-    <script
-      src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js"
-      defer
-    ></script>
+<head>
+  <meta charset="utf-8" />
+  <title>EVA Script · Asistente SFMC</title>
 
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          sans-serif;
-        background: radial-gradient(circle at top, #0b1120, #000);
-        color: #ffffff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        background: url(img/imgbackground.jpg) no-repeat center center fixed; 
-        -webkit-background-size: cover;
-        -moz-background-size: cover;
-        -o-background-size: cover;
-        background-size: cover;
-      }
+  <!-- Script oficial de ChatKit -->
+  <script src="https://cdn.platform.openai.com/deployments/chatkit/chatkit.js" defer></script>
 
-  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #0b1120, #000);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: url(img/imgbackground.jpg) no-repeat center center fixed;
+      -webkit-background-size: cover;
+      -moz-background-size: cover;
+      -o-background-size: cover;
+      background-size: cover;
+    }
+
+
+    .eva-wrapper {
+      width: 90%;
+      padding: 16px;
+      box-sizing: border-box;
+      margin: 0 auto;
+      /* Center the wrapper */
+    }
+
+    @media (min-width: 1024px) {
       .eva-wrapper {
-        width: 100%;
-        max-width: 720px;
-        padding: 16px;
-        box-sizing: border-box;
+        width: 50%;
       }
+    }
 
-      .eva-card {
-        border-radius: 16px;
-/*        background: linear-gradient(180deg, #111827 0%, #020617 100%);
+    @media (min-width: 1440px) {
+      .eva-wrapper {
+        width: 66%;
+      }
+    }
+
+    .eva-card {
+      border-radius: 16px;
+      /*        background: linear-gradient(180deg, #111827 0%, #020617 100%);
         box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); */
-        padding: 12px;
-      }
+      padding: 12px;
+    }
 
-      .eva-header {
-        padding: 8px 12px 4px;
-        font-size: 14px;
-        color: #e5e7eb;
-      }
+    .eva-header {
+      padding: 8px 12px 4px;
+      font-size: 14px;
+      color: #e5e7eb;
+    }
 
-      .eva-header strong {
-        color: #22c55e;
-      }
+    .eva-header strong {
+      color: #22c55e;
+    }
 
-      .eva-chat {
-        width: 100%;
-        height: 90vh;
-        border-radius: 12px;
-        overflow: hidden;
-      }
+    .eva-chat {
+      width: 100%;
+      height: 90vh;
+      border-radius: 12px;
+      overflow: hidden;
+    }
 
-      #eva-chat-container {
-        -webkit-box-shadow:0px 0px 51px 12px rgba(46,168,255,0.73);
--moz-box-shadow: 0px 0px 51px 12px rgba(46,168,255,0.73);
-box-shadow: 0px 0px 51px 12px rgba(46,168,255,0.73);
-border-radius: 1em;
-      }
+    #eva-chat-container {
+      -webkit-box-shadow: 0px 0px 51px 12px rgba(46, 168, 255, 0.73);
+      -moz-box-shadow: 0px 0px 51px 12px rgba(46, 168, 255, 0.73);
+      box-shadow: 0px 0px 51px 12px rgba(46, 168, 255, 0.73);
+      border-radius: 1em;
+    }
+  </style>
+</head>
 
-    </style>
-  </head>
-  <body>
-    <div class="eva-wrapper">
-      <div class="eva-card">
-        <div class="eva-header">
-          <strong>EVA Script</strong> · Asistente SFMC
-        </div>
-        <div id="eva-chat-container"></div>
+<body>
+  <div class="eva-wrapper">
+    <div class="eva-card">
+      <div class="eva-header">
+        <strong>EVA Script</strong> · Asistente SFMC
       </div>
+      <div id="eva-chat-container"></div>
     </div>
+  </div>
 
-    <script>
-      function initEvaChat() {
-        const container = document.getElementById("eva-chat-container");
-        if (!container) {
-          console.error("No se encontró el contenedor EVA");
-          return;
-        }
-
-        const chatkit = document.createElement("openai-chatkit");
-        chatkit.classList.add("eva-chat");
-
-        chatkit.setOptions({
-          // 🔐 Cómo obtiene ChatKit el client_secret desde tu backend
-          api: {
-            async getClientSecret(currentClientSecret) {
-              console.log(
-                "🔄 getClientSecret llamado. ¿Había uno previo?:",
-                !!currentClientSecret
-              );
-
-              const res = await fetch(
-                "/.netlify/functions/chatkit-session",
-                {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    userId: "eva-test-user",
-                    currentClientSecret,
-                  }),
-                }
-              );
-
-              if (!res.ok) {
-                console.error(
-                  "Error desde la función Netlify:",
-                  res.status,
-                  res.statusText
-                );
-                const text = await res.text();
-                console.error("Respuesta:", text);
-                throw new Error("No se pudo obtener client_secret");
-              }
-
-              const data = await res.json();
-              console.log("✅ client_secret recibido:", data.client_secret);
-
-              if (!data.client_secret) {
-                console.error(
-                  "La respuesta no trae client_secret:",
-                  data
-                );
-                throw new Error("Respuesta inválida del servidor");
-              }
-
-              return data.client_secret;
-            },
-          },
-
-          // 📎 Adjuntos habilitados
-          composer: {
-            attachments: {
-              enabled: true,
-            },
-          },
-
-          // 🌙 Tema dark + acento verde EVA
-          theme: {
-            colorScheme: "dark", // <- esto pone el UI en dark mode
-            color: {
-              accent: {
-                primary: "#22c55e", // verde EVA
-                level: 2,
-              },
-            },
-            radius: "round",
-            density: "normal",
-            typography: {
-              fontFamily:
-                "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-            },
-          },
-        });
-
-        container.appendChild(chatkit);
+  <script>
+    function initEvaChat() {
+      const container = document.getElementById("eva-chat-container");
+      if (!container) {
+        console.error("No se encontró el contenedor EVA");
+        return;
       }
 
-      window.addEventListener("load", initEvaChat);
-    </script>
-  </body>
+      const chatkit = document.createElement("openai-chatkit");
+      chatkit.classList.add("eva-chat");
+
+      chatkit.setOptions({
+        // 🔐 Cómo obtiene ChatKit el client_secret desde tu backend
+        api: {
+          async getClientSecret(currentClientSecret) {
+            console.log(
+              "🔄 getClientSecret llamado. ¿Había uno previo?:",
+              !!currentClientSecret
+            );
+
+            const res = await fetch(
+              "/.netlify/functions/chatkit-session",
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  userId: "eva-test-user",
+                  currentClientSecret,
+                }),
+              }
+            );
+
+            if (!res.ok) {
+              console.error(
+                "Error desde la función Netlify:",
+                res.status,
+                res.statusText
+              );
+              const text = await res.text();
+              console.error("Respuesta:", text);
+              throw new Error("No se pudo obtener client_secret");
+            }
+
+            const data = await res.json();
+            console.log("✅ client_secret recibido:", data.client_secret);
+
+            if (!data.client_secret) {
+              console.error(
+                "La respuesta no trae client_secret:",
+                data
+              );
+              throw new Error("Respuesta inválida del servidor");
+            }
+
+            return data.client_secret;
+          },
+        },
+
+        // 📎 Adjuntos habilitados
+        composer: {
+          attachments: {
+            enabled: true,
+          },
+        },
+
+        // 🌙 Tema dark + acento verde EVA
+        theme: {
+          colorScheme: "dark", // <- esto pone el UI en dark mode
+          color: {
+            accent: {
+              primary: "#22c55e", // verde EVA
+              level: 2,
+            },
+          },
+          radius: "round",
+          density: "normal",
+          typography: {
+            fontFamily:
+              "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+          },
+        },
+      });
+
+      container.appendChild(chatkit);
+    }
+
+    window.addEventListener("load", initEvaChat);
+  </script>
+</body>
+
 </html>
