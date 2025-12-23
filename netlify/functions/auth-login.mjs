@@ -71,6 +71,8 @@ export async function handler(event) {
       const token = generateToken();
       const expires = Date.now() + (24 * 60 * 60 * 1000);
       
+      console.log(`✅ EVA Login successful at ${new Date().toISOString()}`);
+      
       return {
         statusCode: 200,
         headers: CORS_HEADERS,
@@ -81,6 +83,8 @@ export async function handler(event) {
         }),
       };
     } else {
+      console.log(`❌ EVA Login failed at ${new Date().toISOString()}`);
+      
       return {
         statusCode: 401,
         headers: CORS_HEADERS,
