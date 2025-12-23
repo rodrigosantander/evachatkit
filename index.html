@@ -116,11 +116,6 @@
       return true;
     }
 
-    // Check auth before initializing chat
-    if (!checkAuth()) {
-      return; // Stop execution if not authenticated
-    }
-
     // Add user info display for individual users
     function displayUserInfo() {
       const userInfo = localStorage.getItem('eva_user_info');
@@ -223,6 +218,12 @@
     }
 
     window.addEventListener("load", function() {
+      // Check authentication first
+      if (!checkAuth()) {
+        return; // Will redirect to login, don't initialize chat
+      }
+      
+      // If authenticated, proceed with initialization
       displayUserInfo();
       initEvaChat();
     });
