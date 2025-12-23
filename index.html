@@ -98,6 +98,45 @@
   </div>
 
   <script>
+    // Authentication check
+    function checkAuth() {
+      const token = localStorage.getItem('eva_auth_token');
+      const expires = localStorage.getItem('eva_auth_expires');
+      
+      if (!token || !expires || Date.now() > parseInt(expires)) {
+        // Clear expired tokens
+        localStorage.removeItem('eva_auth_token');
+        localStorage.removeItem('eva_auth_expires');
+        
+        // Redirect to login
+        window.location.href = '/login.html';
+        return false;
+      }
+      
+      return true;
+    }
+
+    // Check auth before initializing chat
+    if (!checkAuth()) {
+      return; // Stop execution if not authenticated
+    }
+
+    // Add user info display for individual users
+    function displayUserInfo() {
+      const userInfo = localStorage.getItem('eva_user_info');
+      if (userInfo) {
+        try {
+          const user = JSON.parse(userInfo);
+          const header = document.querySelector('.eva-header');
+          if (header && user.name) {
+            header.innerHTML = `<strong>EVA Script</strong> · Asistente SFMC · Bienvenido, ${user.name}`;
+          }
+        } catch (error) {
+          console.log('No user info available');
+        }
+      }
+    }
+
     function initEvaChat() {
       const container = document.getElementById("eva-chat-container");
       if (!container) {
@@ -183,7 +222,10 @@
       container.appendChild(chatkit);
     }
 
-    window.addEventListener("load", initEvaChat);
+    window.addEventListener("load", function() {
+      displayUserInfo();
+      initEvaChat();
+    });
   </script>
 </body>
 
