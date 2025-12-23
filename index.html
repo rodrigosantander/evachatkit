@@ -182,13 +182,26 @@
               !!currentClientSecret
             );
 
+            // Get authenticated user's name
+            const userInfo = localStorage.getItem('eva_user_info');
+            let userId = 'eva-default-user';
+            
+            if (userInfo) {
+              try {
+                const user = JSON.parse(userInfo);
+                userId = user.name || 'eva-default-user';
+              } catch (e) {
+                console.error('Error parsing user info:', e);
+              }
+            }
+
             const res = await fetch(
               "/.netlify/functions/chatkit-session",
               {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                  userId: "eva-test-user",
+                  userId: userId,
                   currentClientSecret,
                 }),
               }

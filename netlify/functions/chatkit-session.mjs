@@ -31,7 +31,7 @@ export async function handler(event) {
 
   try {
     const body = event.body ? JSON.parse(event.body) : {};
-    const userId = body.userId || "eva-test-user";
+    const userId = body.userId || "eva-default-user";
 
     if (!process.env.OPENAI_API_KEY) {
       throw new Error("OPENAI_API_KEY no está configurada");
