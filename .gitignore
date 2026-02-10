@@ -2,6 +2,10 @@
 generate-password-hash.js
 generate-user-hashes.js
 
+# Temporary output files (credentials, hashes, etc.)
+*.tmp
+user-output*
+
 # Environment files
 .env
 .env.local
