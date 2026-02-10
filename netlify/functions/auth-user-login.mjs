@@ -506,6 +506,24 @@ const USERS_DB = {
 "name": "Zamahara",
 "active": true,
 "role": "user"
+},
+"analucette@orangedcx.com": {
+"passwordHash": "76918a926d7341e616f5dd419b7633dd71beb2357590658ed264939d81b3293f",
+"name": "Analucette",
+"active": true,
+"role": "user"
+},
+"rvillarreal@orangedcx.com": {
+"passwordHash": "41bf6042923cc880e687c39488ada8ab689d2d3beff5d6b72e88e6fd96e66828",
+"name": "Rvillarreal",
+"active": true,
+"role": "user"
+},
+"usiel@orangedcx.com": {
+"passwordHash": "9bc0435f6fc7421c8cdafce565757379d1538a7d8ebea1fc279de8fe9b85557e",
+"name": "Usiel",
+"active": true,
+"role": "user"
 }
 };
 
