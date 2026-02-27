@@ -524,6 +524,12 @@ const USERS_DB = {
     "name": "Usiel",
     "active": true,
     "role": "user"
+  },
+  "lizbeth@orangedcx.com": {
+    "passwordHash": "5f6abed668e509f71224b35cc8f6e029cab8bc354068f20b3c5317b84603ed71",
+    "name": "Lizbeth",
+    "active": true,
+    "role": "user"
   }
 };
 
